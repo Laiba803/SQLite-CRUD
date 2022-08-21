@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">SQLite DB- CRUD</string>
+    <string name="StudentName">Name</string>
+    <string name="RollNumber">Roll Number</string>
+    <string name="IsEnrolled">Enrolled</string>
+    <string name="ButtonViewAll">View All</string>
+    <string name="Add">Add</string>
+</resources>
