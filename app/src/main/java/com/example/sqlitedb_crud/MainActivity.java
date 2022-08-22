@@ -1,17 +1,22 @@
 package com.example.sqlitedb_crud;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
-import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Switch;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     EditText editName, editRollNumber;
     Switch switchIsActive;
     ListView listViewStudent;
+    int position = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
 
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             StudentModel studentModel;
-
+            DBHelper dbHelper = new DBHelper(MainActivity.this);
             @Override
             public void onClick(View v) {
                 try {
@@ -43,8 +49,13 @@ public class MainActivity extends AppCompatActivity {
                 catch (Exception e){
                     Toast.makeText(MainActivity.this, "Error", Toast.LENGTH_SHORT).show();
                 }
-                DBHelper dbHelper  = new DBHelper(MainActivity.this);
-                dbHelper.addStudent(studentModel);
+                if(buttonAdd.getText() == "Update"){
+                    dbHelper.updateStudent(studentModel, position);
+                    buttonAdd.setText("Add");
+                }
+                else{
+                    dbHelper.addStudent(studentModel);
+                }
             }
         });
 
@@ -52,13 +63,55 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 DBHelper dbHelper = new DBHelper(MainActivity.this);
-                List<StudentModel> list = dbHelper.getAllStudents();
-                ArrayAdapter arrayAdapter = new ArrayAdapter<StudentModel>
-                        (MainActivity.this, android.R.layout.simple_list_item_1,list);
-                listViewStudent.setAdapter(arrayAdapter);
-
+                ArrayList<StudentModel> list = dbHelper.getAllStudents();
+                StudentAdapter studentAdapter = new StudentAdapter(MainActivity.this, list);
+                listViewStudent.setAdapter(studentAdapter);
             }
         });
 
+        listViewStudent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            DBHelper dbHelper = new DBHelper(MainActivity.this);
+            StudentModel student;
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setCancelable(false);
+                Log.d("itemclick", "onClick: yes in 0");
+                builder.setNeutralButton("Edit", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Log.d("itemclick", "onClick: yes in 1");
+                        student = dbHelper.getOneStudent(i);
+                        Log.d("itemclick", "onClick: " + student);
+                        Log.d("itemclick", "onClick: yes in 2");
+                        editName.setText(student.getName());
+                        Log.d("itemclick", "onClick: yes in 3");
+                        editRollNumber.setText(student.getRollNmber());
+                        Log.d("itemclick", "onClick: yes in 4");
+                        if(student.isEnroll())
+                            switchIsActive.setChecked(true);
+                        else
+                            switchIsActive.setChecked(false);
+                        Log.d("itemclick", "onClick: yes in 5");
+                        buttonAdd.setText("Update");
+                        Log.d("itemclick", "onClick: yes in 6");
+                        position = i;
+                        //editName.setText(((TextView) view).getText().toString());
+                        dialog.dismiss();
+                        //Intent intent = new Intent(MainActivity.this, DialogBox.class);
+                        //startActivity(intent);
+                    }
+                });
+                builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+                    }
+                });
+                AlertDialog alert = builder.create();
+                alert.show();
+            }
+        });
     }
 }

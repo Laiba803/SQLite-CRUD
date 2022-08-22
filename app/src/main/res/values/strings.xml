@@ -5,4 +5,7 @@
     <string name="IsEnrolled">Enrolled</string>
     <string name="ButtonViewAll">View All</string>
     <string name="Add">Add</string>
+    <string name="delete">delete</string>
+    <string name="update">Update</string>
+    <string name="id">Id:</string>
 </resources>
