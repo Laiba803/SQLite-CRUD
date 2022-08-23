@@ -37,9 +37,10 @@ public class MainActivity extends AppCompatActivity {
         switchIsActive = findViewById(R.id.switchStudent);
         listViewStudent = findViewById(R.id.listViewStudent);
 
+        DBHelper dbHelper = new DBHelper(MainActivity.this);
+
         buttonAdd.setOnClickListener(new View.OnClickListener() {
             StudentModel studentModel;
-            DBHelper dbHelper = new DBHelper(MainActivity.this);
             @Override
             public void onClick(View v) {
                 try {
@@ -52,6 +53,9 @@ public class MainActivity extends AppCompatActivity {
                 if(buttonAdd.getText() == "Update"){
                     dbHelper.updateStudent(studentModel, position);
                     buttonAdd.setText("Add");
+                    ArrayList<StudentModel> list = dbHelper.getAllStudents();
+                    StudentAdapter studentAdapter = new StudentAdapter(MainActivity.this, list);
+                    listViewStudent.setAdapter(studentAdapter);
                 }
                 else{
                     dbHelper.addStudent(studentModel);
@@ -62,7 +66,6 @@ public class MainActivity extends AppCompatActivity {
         buttonViewAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DBHelper dbHelper = new DBHelper(MainActivity.this);
                 ArrayList<StudentModel> list = dbHelper.getAllStudents();
                 StudentAdapter studentAdapter = new StudentAdapter(MainActivity.this, list);
                 listViewStudent.setAdapter(studentAdapter);
@@ -70,13 +73,13 @@ public class MainActivity extends AppCompatActivity {
         });
 
         listViewStudent.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            DBHelper dbHelper = new DBHelper(MainActivity.this);
             StudentModel student;
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
                 builder.setCancelable(false);
                 Log.d("itemclick", "onClick: yes in 0");
+                position = i;
                 builder.setNeutralButton("Edit", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
@@ -86,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("itemclick", "onClick: yes in 2");
                         editName.setText(student.getName());
                         Log.d("itemclick", "onClick: yes in 3");
-                        editRollNumber.setText(student.getRollNmber());
+//                        editRollNumber.setText(student.getRollNmber());
                         Log.d("itemclick", "onClick: yes in 4");
                         if(student.isEnroll())
                             switchIsActive.setChecked(true);
@@ -95,7 +98,6 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("itemclick", "onClick: yes in 5");
                         buttonAdd.setText("Update");
                         Log.d("itemclick", "onClick: yes in 6");
-                        position = i;
                         //editName.setText(((TextView) view).getText().toString());
                         dialog.dismiss();
                         //Intent intent = new Intent(MainActivity.this, DialogBox.class);
@@ -105,7 +107,7 @@ public class MainActivity extends AppCompatActivity {
                 builder.setNegativeButton("Delete", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        dbHelper.deleteStudent(i);
                         dialog.dismiss();
                     }
                 });
