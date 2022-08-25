@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     EditText editName, editRollNumber;
     Switch switchIsActive;
     ListView listViewStudent;
+    ArrayList<StudentModel> list;
     int position = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,9 +55,10 @@ public class MainActivity extends AppCompatActivity {
                 if(buttonAdd.getText() == "Update"){
                     dbHelper.updateStudent(studentModel, position);
                     buttonAdd.setText("Add");
-                    ArrayList<StudentModel> list = dbHelper.getAllStudents();
+                    list = dbHelper.getAllStudents();
                     StudentAdapter studentAdapter = new StudentAdapter(MainActivity.this, list);
                     listViewStudent.setAdapter(studentAdapter);
+                    studentAdapter.notifyDataSetChanged();
                 }
                 else{
                     dbHelper.addStudent(studentModel);
@@ -66,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
         buttonViewAll.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ArrayList<StudentModel> list = dbHelper.getAllStudents();
+                list = dbHelper.getAllStudents();
                 StudentAdapter studentAdapter = new StudentAdapter(MainActivity.this, list);
                 listViewStudent.setAdapter(studentAdapter);
             }
@@ -89,12 +92,17 @@ public class MainActivity extends AppCompatActivity {
                         Log.d("itemclick", "onClick: yes in 2");
                         editName.setText(student.getName());
                         Log.d("itemclick", "onClick: yes in 3");
-//                        editRollNumber.setText(student.getRollNmber());
+                        //editName.setText(((TextView) view).getText().toString());
+                        //editRollNumber.setText(list.get(i).getRollNmber());
                         Log.d("itemclick", "onClick: yes in 4");
-                        if(student.isEnroll())
+                        if(student.isEnroll()) {
+                            Log.d("itemclick", "onClick: yes in 5 Enrolled");
                             switchIsActive.setChecked(true);
-                        else
+                        }
+                        else {
+                            Log.d("itemclick", "onClick: yes in 5 Note Enrolled");
                             switchIsActive.setChecked(false);
+                        }
                         Log.d("itemclick", "onClick: yes in 5");
                         buttonAdd.setText("Update");
                         Log.d("itemclick", "onClick: yes in 6");

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -85,22 +86,27 @@ public class DBHelper extends SQLiteOpenHelper {
     public StudentModel getOneStudent(int ID){
         SQLiteDatabase db = this.getReadableDatabase();
         StudentModel student = null;
+        ID+=1;
         Cursor cursorCourses = db.rawQuery("SELECT * FROM " + STUDENT_TABLE +
-                " WHERE " + STUDENT_ID + " = '" + ID+1 +"'", null);
+                " WHERE " + STUDENT_ID + " = '" + ID +"'", null);
         if (cursorCourses.moveToFirst()){
-            student = new StudentModel(cursorCourses.getString(1),
-                cursorCourses.getInt(2),
-                cursorCourses.getInt(3) == 1 ? true : false);
+            do {
+                student = new StudentModel(cursorCourses.getString(1),
+                        cursorCourses.getInt(2),
+                        cursorCourses.getInt(3) == 1 ? true : false);
+            }while(cursorCourses.moveToNext());
         }
         cursorCourses.close();
         return student;
     }
 
     public void updateStudent(StudentModel studentModel, int ID){
+        ID+=1;
+        Log.d("itemclick", "updateStudent: " + studentModel);
         SQLiteDatabase db = this.getWritableDatabase();
         String updateQuery = "UPDATE " + STUDENT_TABLE + " SET " + STUDENT_NAME + " = '" +
                 studentModel.getName() + "' , " + STUDENT_ROLL + " = '" +  studentModel.getRollNmber() + "' , "
-                + STUDENT_ENROLL + " = '" + studentModel.isEnroll() +"' WHERE " + STUDENT_ID + " = '" + ID+1 +"'";
+                + STUDENT_ENROLL + " = '" + studentModel.isEnroll() +"' WHERE " + STUDENT_ID + " = '" + ID +"'";
         db.execSQL(updateQuery);
         db.close();
     }
